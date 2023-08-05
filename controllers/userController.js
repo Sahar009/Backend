@@ -14,7 +14,7 @@ const generateToken = (id) =>{
 
 
 const registerUser = async_handler( async(req,res) =>{
-    const {name,email, password} = req
+    const {name,email, password} = req.body
     //or req.body.email
 
     //validation
