@@ -50,7 +50,7 @@ app.use(errorHandler)
 
 //connect to mongoDB and start server
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(`mongodb+srv://akinwumisehinde:saha123@cluster1.6aujasa.mongodb.net/parach_backend?retryWrites=true&w=majority`)
 .then(() =>{
     app.listen(PORT, () =>{
         console.log(`server running on port ${PORT}`)
