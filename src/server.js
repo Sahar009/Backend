@@ -4,13 +4,13 @@ const dotenv = require('dotenv').config()
 const cors = require('cors')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser');
-const connectDB = require('./cofig/connectDB')
+const connectDB = require('../cofig/connectDB')
 const app = express();
-const userRoute = require('./Routes/userRoute')
-const studentRoute = require('./Routes/studentRoute')
-const enquiryRoute = require('./Routes/enquiryRoute')
-const contactRoute = require('./Routes/contactRoute')
-const errorHandler = require('./middleware/errorMiddleware')
+const userRoute = require('../Routes/userRoute')
+const studentRoute = require('../Routes/studentRoute')
+const enquiryRoute = require('../Routes/enquiryRoute')
+const contactRoute = require('../Routes/contactRoute')
+const errorHandler = require('../middleware/errorMiddleware')
 const cookieParser = require('cookie-parser')
 
 //reinstalled 
