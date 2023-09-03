@@ -18,7 +18,9 @@ function fileFilter(req, file, cb) {
   if (
     file.mimetype === "image/png" ||
     file.mimetype === "image/jpg" ||
-    file.mimetype === "image/jpeg"
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "video/mp4"||
+    file.mimetype === "audio/mp3"
   ) {
     cb(null, true);
   } else {
