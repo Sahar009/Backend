@@ -4,56 +4,57 @@ const { fileSizeFormatter } = require("../utility/fileUpload");
 const cloudinary = require("cloudinary").v2;
 
 const createStudent = async_handler(async(req,res)=>{
-const {name, paid,course,price, description, email, phone} =req.body
+  const {schoolName, phone, address, ageCategory, state,  tutorInfo,players,proofOfPayment} = req.body
 
-// validation 
-if(!name || !email){
-    res.status(400)
-    throw new Error('please fill in all fields ')
-}
-// upload image 
-let fileData = {};
-if (req.file) {
-  // Save image to cloudinary
-  let uploadedFile;
-  try {
-    uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-      folder: "Student mgt App",
-      resource_type: "image",
-    });
-  } catch (error) {
-    res.status(500);
-    throw new Error("Image could not be uploaded");
+  // validation 
+  if(!schoolName || !phone || !address||!ageCategory|| !state){
+      res.status(400)
+      throw new Error('please fill in all fields ')
   }
 
-  fileData = {
-    fileName: req.file.originalname,
-    filePath:uploadedFile.secure_url,
-    // req.file.path uploadedFile.secure_url,
-    fileType: req.file.mimetype,
-    fileSize: fileSizeFormatter(req.file.size, 2),
-  };
+  // upload image 
+  let fileData = {};
+  if (req.file) {
+      // Save image to cloudinary
+      let uploadedFile;
+      try {
+          uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+              folder: "Student mgt App",
+              resource_type: "image",
+          });
+      } catch (error) {
+          res.status(500);
+          throw new Error("Image could not be uploaded");
+      }
 
+      fileData = {
+          fileName: req.file.originalname,
+          filePath: uploadedFile.secure_url,
+          fileType: req.file.mimetype,
+          fileSize: fileSizeFormatter(req.file.size, 2),
+      };
+  }
 
-// create student
-const student = await Student.create({
-    user: req.user.id,
-    name,
-    course,
-    email,
-    phone,
-    paid,
-    price,
-    description,
-    image: fileData,
+  // create student
+  const student = await Student.create({
+      // user: req.user.id,
+      
+      schoolName,
+      phone,
+      address,
+      phone,
+      image: fileData,
+      ageCategory,
+      players,
+  });
 
-})
-res.status(201).json(student)
-}})
+  res.status(201).json(student);
+});
+
 
 // get all  students 
 const getStudents = async_handler(async(req,res) =>{
-const students = await Student.find({user:req.user.id}).sort('-createdAt')
+const students = await Student.find().sort('-createdAt')
 // user:req.user.id
 res.status(200).json(students)
 })

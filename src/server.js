@@ -31,7 +31,7 @@ app.use(cookieParser())
 app.use(express.urlencoded({extended:false}))
 app.use(bodyParser.json())
 app.use(cors({
-    origin: ['http://localhost:3000','https://parach-mgt.vercel.app','https://wham-iota.vercel.app','https://wham-sahar009.vercel.app','https://dashboard-sahar009.vercel.app'],
+    origin: ['http://localhost:3000','https://nigerianchess.vercel.app'],
     credentials:true,
 }))
 
@@ -50,7 +50,7 @@ app.use(errorHandler)
 
 //connect to mongoDB and start server
 
-mongoose.connect(`mongodb+srv://akinwumisehinde:saha123@cluster1.6aujasa.mongodb.net/parach_backend?retryWrites=true&w=majority`)
+mongoose.connect(`mongodb+srv://akinwumisehinde:z8xNmGUmmVusEK4G@cluster0.llvbzc5.mongodb.net/?retryWrites=true&w=majority`)
 .then(() =>{
     app.listen(PORT, () =>{
         console.log(`server running on port ${PORT}`)
