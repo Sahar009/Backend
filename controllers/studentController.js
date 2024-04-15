@@ -2,62 +2,93 @@ const async_handler = require("express-async-handler");
 const Student = require("../models/studentModel");
 const { fileSizeFormatter } = require("../utility/fileUpload");
 const cloudinary = require("cloudinary").v2;
+const NodeCache = require("node-cache");
+const cache = new NodeCache();
 
-const createStudent = async_handler(async(req,res)=>{
-  const {schoolName, phone, address, ageCategory, state,  tutorInfo,players,proofOfPayment} = req.body
+const createStudent = async_handler(async (req, res) => {
+  const {
+    schoolName,
+    phone,
+    address,
+    ageCategory,
+    state,
+    tutorInfo,
+    tutorPhone,
+    // proofOfPayment,
+    schoolEcobankAccount,
+    schoolEmail,
+    principalName,
+    image
+  } = req.body;
 
-  // validation 
-  if(!schoolName || !phone || !address||!ageCategory|| !state){
-      res.status(400)
-      throw new Error('please fill in all fields ')
+  // Validation
+  if (!schoolName || !phone || !address) {
+    res.status(400);
+    throw new Error('Please fill in all required fields');
   }
 
-  // upload image 
+  // Check if proof of payment file is present
+  if (!req.file) {
+    res.status(400).json({ msg: 'Please provide proof of payment' });
+    return;
+  }
+
+  // Upload proof of payment file to Cloudinary
   let fileData = {};
-  if (req.file) {
-      // Save image to cloudinary
-      let uploadedFile;
-      try {
-          uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-              folder: "Student mgt App",
-              resource_type: "image",
-          });
-      } catch (error) {
-          res.status(500);
-          throw new Error("Image could not be uploaded");
-      }
+  try {
+    uploadedFile = await cloudinary.uploader.upload(req.file.path, {
+      folder: "Student mgt App",
+      resource_type: "image",
+  });
 
-      fileData = {
-          fileName: req.file.originalname,
-          filePath: uploadedFile.secure_url,
-          fileType: req.file.mimetype,
-          fileSize: fileSizeFormatter(req.file.size, 2),
-      };
-  }
-
-  // create student
-  const student = await Student.create({
-      // user: req.user.id,
-      
+  fileData = {
+    fileName: req.file.originalname,
+    filePath: uploadedFile.secure_url,
+    fileType: req.file.mimetype,
+    fileSize: fileSizeFormatter(req.file.size, 2),
+};
+    const createdStudent = await Student.create({
       schoolName,
       phone,
       address,
-      phone,
-      image: fileData,
+      state,
       ageCategory,
-      players,
-  });
+      tutorInfo,
+      tutorPhone,
+      image: fileData,
+      schoolEcobankAccount,
+      schoolEmail,
+      principalName,
+    });
 
-  res.status(201).json(student);
+    res.status(201).json({ msg: 'Student created successfully', student: createdStudent });
+  } catch (error) {
+    console.error('Error uploading proof of payment to Cloudinary:', error);
+    res.status(500).json({ msg: 'Proof of payment could not be uploaded', error: error.message });
+  }
+
+ 
 });
+
+
 
 
 // get all  students 
 const getStudents = async_handler(async(req,res) =>{
-const students = await Student.find().sort('-createdAt')
-// user:req.user.id
-res.status(200).json(students)
-})
+  // Check if students data exists in the cache
+  const cachedStudents = cache.get("students");
+  if (cachedStudents) {
+      return res.status(200).json(cachedStudents);
+  }
+
+  // Fetch students from the database
+  const students = await Student.find().sort('-createdAt');
+  
+  // Store fetched students in the cache
+  cache.set("students", students);
+
+  res.status(200).json(students);
+});
 
 // Get single student
 const getStudent = async_handler(async (req, res) => {
