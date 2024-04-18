@@ -1,10 +1,10 @@
 const async_handler = require("express-async-handler");
 const Student = require("../models/studentModel");
-const { fileSizeFormatter } = require("../utility/fileUpload");
+
 const cloudinary = require("cloudinary").v2;
 const NodeCache = require("node-cache");
+const { fileSizeFormatter } = require("../utility/fileUpload");
 const cache = new NodeCache();
-
 const createStudent = async_handler(async (req, res) => {
   const {
     schoolName,
@@ -14,39 +14,62 @@ const createStudent = async_handler(async (req, res) => {
     state,
     tutorInfo,
     tutorPhone,
-    // proofOfPayment,
     schoolEcobankAccount,
     schoolEmail,
     principalName,
-    image
+    image,
+    ...formData // Destructure the remaining fields
   } = req.body;
 
+  // Parse player data from the form data
+
+  const players = [];
+    for (let i = 0; i < 5; i++) {
+      if (formData[`name${i}`]) {
+        players.push({
+          name: formData[`name${i}`],
+          dateOfBirth: formData[`dateOfBirth${i}`],
+          fideId: formData[`fideId${i}`]
+        });
+      }
+    }
+
+
   // Validation
-  if (!schoolName || !phone || !address) {
+  if (!schoolName || !phone || !address ) {
     res.status(400);
     throw new Error('Please fill in all required fields');
   }
+  // if(players.length < 4){
+  //   throw new Error ('players reg must be more than 4')
+  // }
+ 
 
-  // Check if proof of payment file is present
-  if (!req.file) {
-    res.status(400).json({ msg: 'Please provide proof of payment' });
-    return;
-  }
 
-  // Upload proof of payment file to Cloudinary
+  // Save student data to the database
   let fileData = {};
-  try {
-    uploadedFile = await cloudinary.uploader.upload(req.file.path, {
-      folder: "Student mgt App",
-      resource_type: "image",
-  });
 
-  fileData = {
-    fileName: req.file.originalname,
-    filePath: uploadedFile.secure_url,
-    fileType: req.file.mimetype,
-    fileSize: fileSizeFormatter(req.file.size, 2),
-};
+  try {
+    //Check if a file is provided in the request
+    // if (!req.file) {
+    //   res.status(400);
+    //   throw new Error('Please provide proof of funds!');
+    // }
+    // if (!req.files || !req.files['image']) {
+    //   res.status(400);
+    //   throw new Error('Please provide proof of funds');
+    // }
+    // //Save the image to cloudinary
+    // const uploadedFile = await cloudinary.uploader.upload(req.files['image'][0].path, {
+    //   folder: "Proof of Payment",
+    //   resource_type: "image",
+    // });
+    // fileData = {
+    //   fileName: req.files['image'][0].originalname,
+    //     filePath: uploadedFile.secure_url,
+    //     fileType: req.files['image'][0].mimetype,
+    //     fileSize: fileSizeFormatter(req.files['image'][0].size, 2),
+    // };
     const createdStudent = await Student.create({
       schoolName,
       phone,
@@ -55,39 +78,38 @@ const createStudent = async_handler(async (req, res) => {
       ageCategory,
       tutorInfo,
       tutorPhone,
-      image: fileData,
       schoolEcobankAccount,
       schoolEmail,
       principalName,
+      image:fileData,
+      players // Include players data
     });
 
     res.status(201).json({ msg: 'Student created successfully', student: createdStudent });
-  } catch (error) {
-    console.error('Error uploading proof of payment to Cloudinary:', error);
-    res.status(500).json({ msg: 'Proof of payment could not be uploaded', error: error.message });
+  
+ } catch (error) {
+    console.error('Error creating student:', error);
+    res.status(500).json({ msg: 'Student creation failed', error });
   }
-
- 
 });
 
 
 
 
+
 // get all  students 
-const getStudents = async_handler(async(req,res) =>{
-  // Check if students data exists in the cache
-  const cachedStudents = cache.get("students");
-  if (cachedStudents) {
-      return res.status(200).json(cachedStudents);
+const getStudents = async_handler(async(req,res) => {
+  try {
+      // Fetch students from the database
+      const students = await Student.find().sort('-createdAt');
+      
+      // Return the fetched students
+      res.status(200).json(students);
+  } catch (error) {
+      // Handle errors
+      console.error('Error fetching students:', error);
+      res.status(500).json({ error: 'Failed to fetch students' });
   }
-
-  // Fetch students from the database
-  const students = await Student.find().sort('-createdAt');
-  
-  // Store fetched students in the cache
-  cache.set("students", students);
-
-  res.status(200).json(students);
 });
 
 // Get single student
