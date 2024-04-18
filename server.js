@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(bodyParser.json())
 app.use(cors({
-    origin: ['http://localhost:3000','https://nigerianchess.vercel.app','http://nationalschoolchess.com','https://nigerian-school-chess.onrender.com'],
+    origin: ['http://localhost:3000','https://nigerianchess.vercel.app','https://www.nationalschoolchess.com','https://nigerian-school-chess.onrender.com'],
     credentials:true,
 }))
 
