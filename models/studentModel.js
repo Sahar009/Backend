@@ -6,9 +6,9 @@ const playerSchema = mongoose.Schema({
         required: [true, 'Please add a player name'],
         trim: true
     },
-    dateOfBirth: {
-        type: String,
-    },
+    // dateOfBirth: {
+    //     type: String,
+    // },
     fideId: {
         type: String,
         trim: true
@@ -62,22 +62,13 @@ const studentSchema = mongoose.Schema({
         trim: true
     },
    
-    schoolEmail: {
-        type: String,
-        required: [true, 'please add school email'],
-    unique: true,
-    trim: true,
-    match: [
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-      'please enter a valid email',
-    ],
-    
+   
        
         
-    },
-    schoolEcobankAccount: {
-        type:String
-    },
+    // },
+    // schoolEcobankAccount: {
+    //     type:String
+    // },
     image: {
         fileName: String,
         filePath: String,

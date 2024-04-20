@@ -15,7 +15,7 @@ const createStudent = async_handler(async (req, res) => {
     tutorInfo,
     tutorPhone,
     schoolEcobankAccount,
-    schoolEmail,
+  
     principalName,
     image,
     ...formData // Destructure the remaining fields
@@ -28,7 +28,7 @@ const createStudent = async_handler(async (req, res) => {
       if (formData[`name${i}`]) {
         players.push({
           name: formData[`name${i}`],
-          dateOfBirth: formData[`dateOfBirth${i}`],
+          // dateOfBirth: formData[`dateOfBirth${i}`],
           fideId: formData[`fideId${i}`]
         });
       }
@@ -79,7 +79,7 @@ const createStudent = async_handler(async (req, res) => {
       tutorInfo,
       tutorPhone,
       schoolEcobankAccount,
-      schoolEmail,
+      // schoolEmail,
       principalName,
       image:fileData,
       players // Include players data
